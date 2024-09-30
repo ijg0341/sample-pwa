@@ -4,16 +4,16 @@ import {useEffect, useState} from "react";
 import dayjs from 'dayjs'
 import * as React from "react";
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/sw.js")
-    .then(function (registration) {
-      console.log("Service Worker registered with scope:", registration.scope);
-    })
-    .catch(function (err) {
-      console.log("Service Worker registration failed", err);
-    });
-}
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/sw.js")
+//     .then(function (registration) {
+//       console.log("Service Worker registered with scope:", registration.scope);
+//     })
+//     .catch(function (err) {
+//       console.log("Service Worker registration failed", err);
+//     });
+// }
 
 function App() {
   const { IDB, write, getDatas, remove, update } = useIndxedDB()
