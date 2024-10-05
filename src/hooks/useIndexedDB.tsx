@@ -1,17 +1,10 @@
 import {create} from "zustand";
 import {useEffect} from "react";
+import {ReportsDataSet} from "@/model/model.tsx";
 
 interface Store {
   IDB: IDBDatabase | null
   initIDB: (IDB: IDBDatabase) => void
-}
-
-export interface LocalImage {
-  id: number
-  data: Blob
-  create_at: string
-  is_server_upload: boolean
-  try_count: 0
 }
 
 const useIndexedDBStore = create<Store>((set) => ({
@@ -19,14 +12,14 @@ const useIndexedDBStore = create<Store>((set) => ({
   initIDB: (IDB: IDBDatabase) => set(() => ({ IDB }))
 }))
 
-const useIndexedDB = () => {
+const useIndexedDB = (objectStoreName: string) => {
   const { IDB, initIDB } = useIndexedDBStore()
 
   const indexedDBOpenRequest =  () => {
     const request =  indexedDB.open('SampleDB')
     request.onupgradeneeded = function () {
       const db = this.result;
-      db.createObjectStore('images', {keyPath: 'id', autoIncrement: true})
+      db.createObjectStore(objectStoreName, {keyPath: 'id', autoIncrement: true})
     }
     request.onerror = (e) => { console.error(e) }
     request.onsuccess = () => {
@@ -34,14 +27,11 @@ const useIndexedDB = () => {
     }
   }
 
-  const write = (data: Partial<LocalImage>) => {
+  const write = (data: Partial<ReportsDataSet>) => {
     if(!IDB) { return }
 
-    const transaction = IDB.transaction(['images'], 'readwrite')
-    // transaction.oncomplete =()=>console.log('success');
-    // transaction.onerror =()=> console.log('fail');
-
-    const objStore = transaction.objectStore('images')
+    const transaction = IDB.transaction([objectStoreName], 'readwrite')
+    const objStore = transaction.objectStore(objectStoreName)
     const request = objStore.add(data)
 
     return new Promise((res, rej) => {
@@ -53,10 +43,10 @@ const useIndexedDB = () => {
   const getDatas = () => {
     if(!IDB) { return }
 
-    const transaction = IDB.transaction(['images'], 'readonly')
-    const request = transaction.objectStore('images').getAll()
+    const transaction = IDB.transaction([objectStoreName], 'readonly')
+    const request = transaction.objectStore(objectStoreName).getAll()
 
-    return new Promise<LocalImage[]>((res, rej) => {
+    return new Promise<ReportsDataSet[]>((res, rej) => {
       request.onsuccess = () => res(request.result)
       request.onerror = () => rej(request.error)
     })
@@ -65,20 +55,20 @@ const useIndexedDB = () => {
   const remove = (id: number) => {
     if(!IDB) { return }
 
-    const transaction = IDB.transaction(['images'], 'readwrite')
-    const request = transaction.objectStore('images').delete(id)
+    const transaction = IDB.transaction([objectStoreName], 'readwrite')
+    const request = transaction.objectStore(objectStoreName).delete(id)
 
-    return new Promise<LocalImage[]>((res, rej) => {
+    return new Promise<ReportsDataSet[]>((res, rej) => {
       request.onsuccess = () => res(request.result)
       request.onerror = () => rej(request.error)
     })
   }
 
-  const update = (data: Partial<LocalImage>) => {
+  const update = (data: Partial<ReportsDataSet>) => {
     if(!IDB) { return }
 
-    const transaction = IDB.transaction(['images'], 'readwrite')
-    const request = transaction.objectStore('images').put(data)
+    const transaction = IDB.transaction([objectStoreName], 'readwrite')
+    const request = transaction.objectStore(objectStoreName).put(data)
 
     return new Promise((res, rej) => {
       request.onsuccess = () => res(request.result)
