@@ -13,7 +13,7 @@ function App() {
   const { IDB, write, getDatas, remove, update } = useIndxedDB('reports')
   const { s3, getImages: getS3, uploadImage } = useS3('brown-pwa-sample')
   const [data, setData] = useState<ReportsDataSet[]>([])
-  const [serverData, setServerData] = useState()
+  // const [serverData, setServerData] = useState()
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
 

@@ -42,13 +42,16 @@ const useS3 = (bucketName) => {
   }
 
   useEffect(() => {
-    setS3(new AWS.S3({
-      region: 'ap-northeast-2',
-      credentials:{
-        accessKeyId: import.meta.env.VITE_S3_ACCESS_KEY,
-        secretAccessKey: import.meta.env.VITE_S3_SECRET_ACCESS_KEY,
-      }
-    }))
+    if(AWS){
+      setS3(new AWS.S3({
+        region: 'ap-northeast-2',
+        credentials:{
+          accessKeyId: import.meta.env.VITE_S3_ACCESS_KEY,
+          secretAccessKey: import.meta.env.VITE_S3_SECRET_ACCESS_KEY,
+        }
+      }))
+    }
+
 
   },[AWS])
 
