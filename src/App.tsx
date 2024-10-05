@@ -3,6 +3,7 @@ import useIndxedDB, {LocalImage} from "./hooks/useIndexedDB.tsx";
 import {useEffect, useState} from "react";
 import dayjs from 'dayjs'
 import * as React from "react";
+import useS3 from "./hooks/useS3.ts";
 
 // if ("serviceWorker" in navigator) {
 //   navigator.serviceWorker
@@ -17,6 +18,7 @@ import * as React from "react";
 
 function App() {
   const { IDB, write, getDatas, remove, update } = useIndxedDB()
+  const { s3, getImages: getS3, uploadImage, removeImage } = useS3('brown-pwa-sample')
   const [data, setData] = useState<LocalImage[]>([])
 
   const getImages = async () => {
@@ -24,23 +26,34 @@ function App() {
     setData(result)
   }
 
+  // function* backgroundUploader(images: File[]) {
+  //   while (images.length > 0) {
+  //     const image = images[0];
+  //     yield uploadImage(image, ()=> {
+  //       images.shift();
+  //     })
+  //   }
+  // }
+
   const addImages = async (data: Blob) => {
     await write({
       data: data,
-      create_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
+      create_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      is_server_upload: false,
+      try_count: 0,
     })
     getImages()
   }
 
-  const updateImages = async (data: Partial<LocalImage>) => {
-    try{
-      await update(data)
-      getImages()
-    } catch (e){
-      alert(e.message)
-    }
-
-  }
+  // const updateImages = async (data: Partial<LocalImage>) => {
+  //   try{
+  //     await update(data)
+  //     getImages()
+  //   } catch (e){
+  //     alert(e.message)
+  //   }
+  //
+  // }
 
   const deleteImages = async (id: number) => {
     await remove(id)
@@ -61,6 +74,10 @@ function App() {
     }
   }, [IDB]);
 
+  useEffect(() => {
+
+  }, [data]);
+
   return (
     <>
       <h1>Offline Image Uploader</h1>
@@ -73,9 +90,9 @@ function App() {
         {data.map((images, key) => (
           <div key={key}>
             <img src={URL.createObjectURL(images.data)} width={'150px'}/>
-            <button onClick={() => updateImages({...images, update_at: dayjs().format('YYYY-MM-DD HH:mm:ss')})}>update</button>
+            {/*<button onClick={() => updateImages({...images, update_at: dayjs().format('YYYY-MM-DD HH:mm:ss')})}>update</button>*/}
             <button onClick={() => deleteImages(images.id)}>delete</button>
-            {images.id} {images.create_at} {images.update_at}
+            {images.id} {images.create_at}
           </div>
         ))}
       </div>

@@ -10,7 +10,8 @@ export interface LocalImage {
   id: number
   data: Blob
   create_at: string
-  update_at: string
+  is_server_upload: boolean
+  try_count: 0
 }
 
 const useIndexedDBStore = create<Store>((set) => ({
